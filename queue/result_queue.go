@@ -1,7 +1,6 @@
 package queue
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/hand-writing-authentication-team/HAPI/models"
@@ -40,70 +39,9 @@ func NewRedisClient(addr string) (*ResultQueue, error) {
 	return rq, nil
 }
 
-func (rq *ResultQueue) SuccessInfo(authReq models.AuthenticationRequest) error {
-	resultResp := models.ResultResp{
-		JobID:     authReq.JobID,
-		Status:    "success",
-		TimeStamp: time.Now().Unix(),
-	}
-	var resultStr string
-	resultBytes, err := json.Marshal(resultResp)
-	if err != nil {
-		log.WithError(err).Errorf("failed marshal the response")
-		return err
-	}
-	resultStr = (string)(resultBytes)
-	// Publish a message.
-	err = rq.redisDB.Set(authReq.JobID, resultStr, 0).Err()
-	if err != nil {
-		log.WithError(err).Errorf("failed to give SUCCESS info for job %s", authReq.JobID)
-		return err
-	}
-	return nil
-}
-
-func (rq *ResultQueue) FailureInfo(authReq models.AuthenticationRequest, msg string) error {
-	resultResp := models.ResultResp{
-		JobID:     authReq.JobID,
-		Status:    "failure",
-		ErrorMsg:  msg,
-		TimeStamp: time.Now().Unix(),
-	}
-	var resultStr string
-	resultBytes, err := json.Marshal(resultResp)
-	if err != nil {
-		log.WithError(err).Errorf("failed marshal the response")
-		return err
-	}
-	resultStr = (string)(resultBytes)
-	// Publish a message.
-	err = rq.redisDB.Set(authReq.JobID, resultStr, 0).Err()
-	if err != nil {
-		log.WithError(err).Errorf("failed to give FAILURE info for job %s", authReq.JobID)
-		return err
-	}
-	return nil
-}
-
-func (rq *ResultQueue) ErrorInfo(authReq models.AuthenticationRequest, msg string) error {
-	resultResp := models.ResultResp{
-		JobID:     authReq.JobID,
-		Status:    "error",
-		ErrorMsg:  msg,
-		TimeStamp: time.Now().Unix(),
-	}
-	var resultStr string
-	resultBytes, err := json.Marshal(resultResp)
-	if err != nil {
-		log.WithError(err).Errorf("failed marshal the response")
-		return err
-	}
-	resultStr = (string)(resultBytes)
-	// Publish a message.
-	err = rq.redisDB.Set(authReq.JobID, resultStr, 0).Err()
-	if err != nil {
-		log.WithError(err).Errorf("failed to give ERROR info for job %s", authReq.JobID)
-		return err
-	}
-	return nil
+func (rq *ResultQueue) Listen(jobID string) (*models.ResultResp, error) {
+	str := rq.redisDB.Get(jobID)
+	str.String()
+	// need to do a poc on this
+	return nil, nil
 }

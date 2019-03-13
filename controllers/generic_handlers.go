@@ -11,6 +11,7 @@ import (
 type ControllerConf struct {
 	Server *mux.Router
 	RQ     *queue.ResultQueue
+	QC     *queue.Queue
 }
 
 func NewServerControllerSet() *ControllerConf {
@@ -19,7 +20,8 @@ func NewServerControllerSet() *ControllerConf {
 	controllerConf := &ControllerConf{
 		Server: server,
 	}
-	controllerConf.Server.HandleFunc("/version", controllerConf.VersionGet)
+	controllerConf.Server.HandleFunc("/version", controllerConf.VersionGet).Methods("GET")
+	controllerConf.Server.HandleFunc("/create_account", controllerConf.CreateAccoundHandler).Methods("POST")
 
 	return controllerConf
 }

@@ -10,11 +10,12 @@ import (
 )
 
 type Queue struct {
-	conn *amqp.Connection
-	ch   []*amqp.Channel
+	conn      *amqp.Connection
+	ch        []*amqp.Channel
+	QueueName string
 }
 
-func NewQueueInstance(host, port, username, password string) (*Queue, error) {
+func NewQueueInstance(host, port, username, password, queue string) (*Queue, error) {
 	// In here the queue, exchange and binding will not be defined
 	// for avoiding orchestration problems
 	amqpStr := fmt.Sprintf("amqp://%s:%s@%s:%s/", username, password, host, port)
@@ -33,6 +34,27 @@ func NewQueueInstance(host, port, username, password string) (*Queue, error) {
 	queueClient := &Queue{}
 	queueClient.conn = conn
 	log.WithField("amqpStr", amqpStr).Info("rabbitmq connection started")
+	ch, err := queueClient.conn.Channel()
+	if err != nil {
+		log.Errorf("channel creation failed because %v", err)
+		return nil, err
+	}
+	defer ch.Close()
+
+	_, err = ch.QueueDeclare(
+		queue, // name
+		false, // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
+	)
+	if err != nil {
+		log.Errorf("queue declaration failed for queue %s", queue)
+		return nil, err
+	}
+	log.WithField("amqpStr", amqpStr).Info("rabbitmq queue started")
+	queueClient.QueueName = queue
 	return queueClient, nil
 }
 
@@ -47,7 +69,7 @@ func (q *Queue) DestroyQueueInstance() error {
 	return q.conn.Close()
 }
 
-func (q *Queue) Publish(exchange, routingKey string, jsonBody map[string]interface{}) error {
+func (q *Queue) Publish(exchange, routingKey string, jsonBody interface{}) error {
 	ch, err := q.conn.Channel()
 	if err != nil {
 		log.Errorf("channel creation failed because %v", err)
@@ -60,11 +82,12 @@ func (q *Queue) Publish(exchange, routingKey string, jsonBody map[string]interfa
 		log.Errorf("json marshal failed because %v", err)
 		return err
 	}
+
 	err = ch.Publish(
 		exchange,   // exchange
 		routingKey, // routing key
-		true,       // mandatory
-		true,       // immediate
+		false,      // mandatory
+		false,      // immediate
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        []byte(jsonByte),
@@ -73,6 +96,7 @@ func (q *Queue) Publish(exchange, routingKey string, jsonBody map[string]interfa
 		log.Errorf("rabbitmq channel publish because %v", err)
 		return err
 	}
+	log.Info("successfully sent the message")
 	return nil
 }
 

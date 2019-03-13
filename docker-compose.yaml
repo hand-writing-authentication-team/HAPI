@@ -17,6 +17,7 @@ services:
       - MQ_USER=rabbitmq
       - MQ_PASSWORD=rabbithole
       - REDIS_ADDR=redis:6379
+      - QUEUE=credstoreIn
     ports:
       - "9099:9099"
 
