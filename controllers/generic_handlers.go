@@ -22,6 +22,7 @@ func NewServerControllerSet() *ControllerConf {
 	}
 	controllerConf.Server.HandleFunc("/version", controllerConf.VersionGet).Methods("GET")
 	controllerConf.Server.HandleFunc("/create_account", controllerConf.CreateAccoundHandler).Methods("POST")
+	controllerConf.Server.HandleFunc("/login", controllerConf.AuthAccountHandler).Methods("POST")
 
 	return controllerConf
 }

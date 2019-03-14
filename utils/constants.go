@@ -6,9 +6,11 @@ const (
 	DeleteAction = "delete"
 	UpdateAction = "update"
 
-	StatusError    = "ERROR"
-	StatusCreated  = "CREATED"
-	StatusConflict = "CONFLICT"
+	StatusError         = "ERROR"
+	StatusSuccess       = "SUCCESS"
+	StatusAuthenticated = "AUTHENTICATED"
+	StatusCreated       = "CREATED"
+	StatusConflict      = "CONFLICT"
 
 	ErrorMsgTimeout             = "TIMEOUT"
 	ErrorMsgInternalServerError = "INTERNAL_SERVER_ERROR"
