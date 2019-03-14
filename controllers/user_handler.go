@@ -42,6 +42,50 @@ func (c *ControllerConf) CreateAccoundHandler(w http.ResponseWriter, r *http.Req
 		json.NewEncoder(w).Encode(accountResp)
 		return
 	}
+	result, err := c.RQ.Listen(jobID)
+	if err != nil {
+		accountResp.Status = utils.StatusError
+		switch err.Error() {
+		case utils.ErrorMsgTimeout:
+			w.WriteHeader(http.StatusGatewayTimeout)
+			break
+		case utils.ErrorMsgInternalServerError:
+			w.WriteHeader(http.StatusInternalServerError)
+			break
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			break
+		}
+		json.NewEncoder(w).Encode(accountResp)
+		return
+	}
+
+	status := result.Status
+	switch status {
+	case utils.StatusError:
+		accountResp.Status = utils.StatusError
+		accountResp.ErrorMsg = result.ErrorMsg
+		log.Errorf("account creation failed as backend failed for job %s", jobID)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	case utils.StatusConflict:
+		accountResp.Status = utils.StatusConflict
+		accountResp.ErrorMsg = result.ErrorMsg
+		log.Errorf("account creation failed as account already exists for job %s", jobID)
+		w.WriteHeader(http.StatusConflict)
+		return
+	case utils.StatusCreated:
+		accountResp.Status = utils.StatusCreated
+		json.NewEncoder(w).Encode(accountResp)
+		break
+	default:
+		accountResp.Status = utils.StatusError
+		log.Errorf("met unrecognizable status %s for jobid %s", status, jobID)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(accountResp)
+		return
+	}
+
 	log.Info("successfully created the account!")
 	w.WriteHeader(http.StatusOK)
 	return

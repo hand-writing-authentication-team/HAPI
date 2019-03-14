@@ -8,5 +8,6 @@ type AccountCreationReq struct {
 
 type AccountCreationResp struct {
 	Username string `json:"username"`
+	ErrorMsg string `json:"error,omitempty"`
 	Status   string `json:"status"`
 }

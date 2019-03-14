@@ -7,9 +7,9 @@ services:
       dockerfile: Dockerfile
     restart: always
     container_name: hapi
-    depends_on:
-      - "redis"
-      - "rabbit"
+    # depends_on:
+    #   - "redis"
+    #   - "rabbit"
     environment:
       - PORT=9099
       - MQ_HOST=rabbit
@@ -31,6 +31,7 @@ services:
   rabbit:
     image: "rabbitmq:3-management"
     restart: always
+    container_name: rabbit
     environment:
       RABBITMQ_DEFAULT_USER: "rabbitmq"
       RABBITMQ_DEFAULT_PASS: "rabbithole"
