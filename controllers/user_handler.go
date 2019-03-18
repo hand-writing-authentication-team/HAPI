@@ -12,6 +12,8 @@ import (
 )
 
 func (c *ControllerConf) CreateAccoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.WithError(err).Error("error occured when reading body of the request")
@@ -41,6 +43,8 @@ func (c *ControllerConf) CreateAccoundHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (c *ControllerConf) AuthAccountHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.WithError(err).Error("error occured when reading body of the request")

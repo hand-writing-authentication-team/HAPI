@@ -44,7 +44,7 @@ func NewRedisClient(addr string) (*ResultQueue, error) {
 }
 
 func (rq *ResultQueue) Listen(jobID string) (*models.ResultResp, error) {
-	timeout := time.Second * 5
+	timeout := time.Second * 1
 	t1 := time.Now()
 	for true {
 		str := rq.redisDB.Get(jobID)
