@@ -38,7 +38,6 @@ func (c *ControllerConf) CreateAccoundHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	log.Info("successfully created the account!")
-	w.WriteHeader(http.StatusCreated)
 	return
 }
 
@@ -69,6 +68,5 @@ func (c *ControllerConf) AuthAccountHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	log.Info("successfully authenticated the account!")
-	w.WriteHeader(http.StatusOK)
 	return
 }

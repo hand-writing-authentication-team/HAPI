@@ -19,6 +19,7 @@ func (c *ControllerConf) PublishAndListen(req models.HAPIReq, action string, w h
 		Username:  req.Username,
 		Password:  req.Password,
 		Handwring: req.Handwriting,
+		Race:      req.Race,
 		Action:    action,
 	}
 	err := c.QC.Publish("", c.QC.QueueName, queueActionReq)
@@ -64,10 +65,13 @@ func (c *ControllerConf) PublishAndListen(req models.HAPIReq, action string, w h
 		json.NewEncoder(w).Encode(resp)
 		return errors.New(status)
 	case utils.StatusCreated:
+		w.WriteHeader(http.StatusCreated)
 		break
 	case utils.StatusAuthenticated:
+		w.WriteHeader(http.StatusOK)
 		break
 	case utils.StatusSuccess:
+		w.WriteHeader(http.StatusOK)
 		break
 	default:
 		resp.Status = utils.StatusError
