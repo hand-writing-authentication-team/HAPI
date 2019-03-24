@@ -23,7 +23,8 @@ func NewServerControllerSet() *ControllerConf {
 	controllerConf.Server.HandleFunc("/version", controllerConf.VersionGet).Methods("GET")
 	controllerConf.Server.HandleFunc("/create_account", controllerConf.CreateAccoundHandler).Methods("POST")
 	controllerConf.Server.HandleFunc("/login", controllerConf.AuthAccountHandler).Methods("POST")
-	controllerConf.Server.HandleFunc("/collect_handwriting", controllerConf.CreateAccoundHandler).Methods("POST")
+	controllerConf.Server.HandleFunc("/collect_handwriting", controllerConf.CollectUserHandler).Methods("POST")
+	controllerConf.Server.HandleFunc("/collect_second", controllerConf.CollectUserSecondHandwritingHandler).Methods("POST")
 
 	return controllerConf
 }
